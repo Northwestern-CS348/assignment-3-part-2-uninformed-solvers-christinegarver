@@ -33,8 +33,55 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        ### student code goes here
-        pass
+        pegs = []
+        peg1 = []
+        peg2 = []
+        peg3 = []
+
+        #words = match[0].bindings_dict('?disk')
+        #text = parse_input('fact: (on ?disk ?peg1)')
+        #text = txt.parse_input("fact: (on ?disk ?peg)")
+        # fact: (on disk3 peg1)
+
+        txt = self.kb.facts
+
+        for f in txt:
+            pred = f.statement.predicate
+            if pred == "on":
+                fact = f.statement.terms
+                if str(fact[1]) == "peg1":
+                    disk = str(fact[0])
+                    if disk == 'disk1':
+                        peg1.append(1)
+                    if disk == 'disk2':
+                        peg1.append(2)
+                    if disk == 'disk3':
+                        peg1.append(3)
+                if str(fact[1]) == "peg2":
+                    disk = str(fact[0])
+                    if disk == 'disk1':
+                        peg2.append(1)
+                    if disk == 'disk2':
+                        peg2.append(2)
+                    if disk == 'disk3':
+                        peg2.append(3)
+                if str(fact[1]) == "peg3":
+                    disk = str(fact[0])
+                    if disk == "disk1":
+                        peg3.append(1)
+                    if disk == "disk2":
+                        peg3.append(2)
+                    if disk == "disk3":
+                        peg3.append(3)
+                peg1.sort()
+                peg2.sort()
+                peg3.sort()
+        pegs.append(tuple(peg1))
+        pegs.append(tuple(peg2))
+        pegs.append(tuple(peg3))
+
+        return tuple(pegs)
+
 
     def makeMove(self, movable_statement):
         """

@@ -16,3 +16,56 @@ fact: (pred obj1 obj2)
 rule: ((pred obj1 obj2) (pred obj2 obj3)) -> (pred obj1 obj3)
 
 """
+
+"""
+Objects & Relationships
+"""
+
+# all disks on peg1
+fact: (on disk3 peg1)
+fact: (on disk2 peg1)
+fact: (on disk1 peg1)
+
+# disks are ontop of each other on peg1
+fact: (ontop disk1 disk2)
+fact: (ontop disk2 disk3)
+
+# disk1 is the top of peg1
+fact: (top disk1 peg1)
+
+# only disk1 is movable right now
+fact: (movable disk1 peg1 peg2)
+fact: (movable disk1 peg1 peg3)
+
+# diskn is smaller than disk m
+fact: (smaller disk1 disk2)
+fact: (smaller disk2 disk3)
+
+#peg2 and peg3 are empty
+fact: (on none peg2)
+fact: (on none peg3)
+
+
+
+"""
+Inferences
+"""
+
+#if disky is smaller than diskx and diskx is smaller than diskz -> disky is smaller than diskz
+rule:((smaller ?X ?Y) (smaller ?Y ?Z)) -> (smaller ?X ?Z)
+
+#if disk is top, its on that peg
+rule: (top ?X ?Y) -> (on ?X ?Y)
+
+#if disk is top and another peg top is bigger, disk is movable
+rule: ((top ?X ?Y) (top ?Z ?V) (smaller ?X ?Z)) -> (movable ?X ?Y ?V)
+
+#if disk is top and another peg is empty, disk is movable
+rule: ((top ?X ?Y) (on none ?V)) -> (movable ?X ?Y ?V)
+
+#disk is not movable if not top
+rule: (~(top ?X ?Y) (on ?X ?Y)) -> ~(movable ?X ?Y ?Y)
+
+#disk is not movable if on that peg
+rule: (on ?X ?Y) -> ~(movable ?X ?Y ?Y)
+rule: (top ?X ?Y) -> ~(movable ?X ?Y ?Y)
