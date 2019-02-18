@@ -17,3 +17,78 @@ fact: (pred obj1 obj2)
 rule: ((pred obj1 obj2) (pred obj2 obj3)) -> (pred obj1 obj3)
 
 """
+
+"""
+Objects & Relationships
+"""
+
+#which tiles are movable
+fact: (movable tile2 pos2 pos1 pos2 pos2)
+fact: (movable tile8 pos1 pos2 pos2 pos2)
+fact: (movable tile4 pos3 pos2 pos2 pos2)
+fact: (movable tile6 pos2 pos3 pos2 pos2)
+
+#which spot is empty
+fact: (empty pos2 pos2)
+
+#positions of tiles
+fact: (position tile1 pos1 pos1)
+fact: (position tile2 pos2 pos1)
+fact: (position tile3 pos3 pos1)
+fact: (position tile4 pos3 pos2)
+fact: (position tile5 pos1 pos1)
+fact: (position tile6 pos2 pos3)
+fact: (position tile7 pos1 pos3)
+fact: (position tile8 pos1 pos2)
+
+#tiles are adjacent to other tiles
+fact: (adjacent tile1 tile2)
+fact: (adjacent tile1 tile8)
+fact: (adjacent tile2 tile1)
+fact: (adjacent tile2 tile3)
+fact: (adjacent tile3 tile2)
+fact: (adjacent tile3 tile4)
+fact: (adjacent tile8 tile1)
+fact: (adjacent tile8 tile7)
+fact: (adjacent tile4 tile3)
+fact: (adjacent tile4 tile5)
+fact: (adjacent tile7 tile8)
+fact: (adjacent tile7 tile6)
+fact: (adjacent tile6 tile7)
+fact: (adjacent tile6 tile5)
+fact: (adjacent tile5 tile4)
+fact: (adjacent tile5 tile6)
+
+
+
+
+"""
+
+Trick: In this game, two tiles A and B are adjacent if they:
+
+share the X coordinate or the Y coordinate, and
+either A or B has the value 2 on the coordinate they do not share.
+This ends up being four rules for adjacency.
+
+"""
+
+
+
+"""
+Inferences
+"""
+
+#define adjacency
+# share X coordinate, B has pos2
+rule: ((position ?A ?X ?Y) (position ?B ?X pos2)) -> (adjacent ?A ?B)
+# share X coordinate, A has pos2
+rule: ((position ?A ?X pos2) (position ?B ?X ?Y)) -> (adjacent ?A ?B)
+# share Y coordinate, B has pos2
+rule: ((position ?A ?X ?Y) (position ?B pos2 ?Y)) -> (adjacent ?A ?B)
+# share Y coordinate, A has pos2
+rule: ((position ?A pos2 ?Y) (position ?B ?X ?Y)) -> (adjacent ?A ?B)
+
+#must be adjacent to be movable
+rule: ((adjacent ?A ?B) (position ?A ?x ?y) (position ?B ?X ?Y) (empty ?X ?Y)) -> (movable ?A ?x ?y ?X ?Y)
+
+

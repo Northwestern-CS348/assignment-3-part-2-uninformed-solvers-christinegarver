@@ -96,7 +96,7 @@ class TowerOfHanoiGame(GameMaster):
             None
         """
         ### Student code goes here
-        
+
         txt = movable_statement.terms
         old_fact = ["on", txt[0], txt[1]]
         fact = ["on", txt[0], txt[2]]
@@ -151,7 +151,87 @@ class Puzzle8Game(GameMaster):
             A Tuple of Tuples that represent the game state
         """
         ### Student code goes here
-        pass
+
+        # fact: (position tile1 pos1 pos1)
+
+        rows = []
+        row1 = []
+        row2 = []
+        row3 = []
+
+        txt = self.kb.facts
+
+        for f in txt:
+            pred = f.statement.predicate
+            if pred == "empty":
+                fact = f.statement.terms
+                if str(fact[1]) == "pos1":
+                    row1.append(-1)
+                if str(fact[1]) == "pos2":
+                    row2.append(-1)
+                if str(fact[1]) == "pos3":
+                    row3.append(-1)
+            if pred == "position":
+                fact = f.statement.terms
+                if str(fact[2]) == "pos1":
+                    disk = str(fact[0])
+                    if disk == 'tile1':
+                        row1.append(1)
+                    if disk == 'tile2':
+                        row1.append(2)
+                    if disk == 'tile3':
+                        row1.append(3)
+                    if disk == 'tile4':
+                        row1.append(4)
+                    if disk == 'tile5':
+                        row1.append(5)
+                    if disk == 'tile6':
+                        row1.append(6)
+                    if disk == 'tile7':
+                        row1.append(7)
+                    if disk == 'tile8':
+                        row1.append(8)
+                if str(fact[2]) == "pos2":
+                    disk = str(fact[0])
+                    if disk == 'tile1':
+                        row2.append(1)
+                    if disk == 'tile2':
+                        row2.append(2)
+                    if disk == 'tile3':
+                        row2.append(3)
+                    if disk == 'tile4':
+                        row2.append(4)
+                    if disk == 'tile5':
+                        row2.append(5)
+                    if disk == 'tile6':
+                        row2.append(6)
+                    if disk == 'tile7':
+                        row2.append(7)
+                    if disk == 'tile8':
+                        row2.append(8)
+                if str(fact[2]) == "pos3":
+                    disk = str(fact[0])
+                    if disk == 'tile1':
+                        row3.append(1)
+                    if disk == 'tile2':
+                        row3.append(2)
+                    if disk == 'tile3':
+                        row3.append(3)
+                    if disk == 'tile4':
+                        row3.append(4)
+                    if disk == 'tile5':
+                        row3.append(5)
+                    if disk == 'tile6':
+                        row3.append(6)
+                    if disk == 'tile7':
+                        row3.append(7)
+                    if disk == 'tile8':
+                        row3.append(8)
+        rows.append(tuple(row1))
+        rows.append(tuple(row2))
+        rows.append(tuple(row3))
+
+        return tuple(rows)
 
     def makeMove(self, movable_statement):
         """
