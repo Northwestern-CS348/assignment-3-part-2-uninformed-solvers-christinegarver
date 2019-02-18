@@ -38,10 +38,6 @@ class TowerOfHanoiGame(GameMaster):
         peg2 = []
         peg3 = []
 
-        #words = match[0].bindings_dict('?disk')
-        #text = parse_input('fact: (on ?disk ?peg1)')
-        #text = txt.parse_input("fact: (on ?disk ?peg)")
-        # fact: (on disk3 peg1)
 
         txt = self.kb.facts
 
@@ -100,7 +96,15 @@ class TowerOfHanoiGame(GameMaster):
             None
         """
         ### Student code goes here
-        pass
+        
+        txt = movable_statement.terms
+        old_fact = ["on", txt[0], txt[1]]
+        fact = ["on", txt[0], txt[2]]
+        new_fact = Fact(fact, [])
+        self.kb.kb_add(new_fact)
+        self.kb.kb_remove(Fact(old_fact))
+
+
 
     def reverseMove(self, movable_statement):
         """
