@@ -106,6 +106,8 @@ class TowerOfHanoiGame(GameMaster):
 
 
 
+
+
     def reverseMove(self, movable_statement):
         """
         See overridden parent class method for more information.
@@ -250,7 +252,13 @@ class Puzzle8Game(GameMaster):
             None
         """
         ### Student code goes here
-        pass
+
+        txt = movable_statement.terms
+        old_fact = ["position", txt[0], txt[1], txt[2]]
+        fact = ["position", txt[0], txt[3], txt[4]]
+        new_fact = Fact(fact, [])
+        self.kb.kb_add(new_fact)
+        self.kb.kb_remove(Fact(old_fact))
 
     def reverseMove(self, movable_statement):
         """
