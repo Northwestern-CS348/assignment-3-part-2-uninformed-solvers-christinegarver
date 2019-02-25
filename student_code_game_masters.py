@@ -38,12 +38,11 @@ class TowerOfHanoiGame(GameMaster):
         peg2 = []
         peg3 = []
 
-
         txt = self.kb.facts
 
         for f in txt:
             pred = f.statement.predicate
-            if pred == "on":
+            if pred and pred == "on":
                 fact = f.statement.terms
                 if str(fact[1]) == "peg1":
                     disk = str(fact[0])
@@ -53,7 +52,7 @@ class TowerOfHanoiGame(GameMaster):
                         peg1.append(2)
                     if disk == 'disk3':
                         peg1.append(3)
-                if str(fact[1]) == "peg2":
+                elif str(fact[1]) == "peg2":
                     disk = str(fact[0])
                     if disk == 'disk1':
                         peg2.append(1)
@@ -61,7 +60,7 @@ class TowerOfHanoiGame(GameMaster):
                         peg2.append(2)
                     if disk == 'disk3':
                         peg2.append(3)
-                if str(fact[1]) == "peg3":
+                elif str(fact[1]) == "peg3":
                     disk = str(fact[0])
                     if disk == "disk1":
                         peg3.append(1)
@@ -98,12 +97,62 @@ class TowerOfHanoiGame(GameMaster):
         ### Student code goes here
 
         txt = movable_statement.terms
-        old_fact = ["on", txt[0], txt[1]]
-        fact = ["on", txt[0], txt[2]]
-        new_fact = Fact(fact, [])
-        self.kb.kb_add(new_fact)
-        self.kb.kb_remove(Fact(old_fact))
+        current_state = self.getGameState()
 
+        old_fact_1 = ["on", txt[0], txt[1]]
+        old_fact_2 = ["top", txt[0], txt[1]]
+
+        self.kb.kb_retract(Fact(old_fact_1))
+        self.kb.kb_retract(Fact(old_fact_2))
+
+        new_fact_1 = ["on", txt[0], txt[2]]
+        new_fact_2 = ["top", txt[0], txt[2]]
+
+        self.kb.kb_assert(Fact(new_fact_1))
+        self.kb.kb_assert(Fact(new_fact_2))
+
+
+
+        #change top and intial
+        initial = str(txt[1])
+        initial_peg = 0
+        if initial == "peg1":
+            initial_peg = 1
+        elif initial == "peg2":
+            initial_peg = 2
+        else:
+            initial_peg = 3
+
+        peg = current_state[initial_peg - 1]
+
+        if len(peg) == 0 or len(peg) == 1:
+            new_fact = ["empty", txt[1]]
+            self.kb.kb_assert(Fact(new_fact))
+        else:
+            new_top = "disk" + str(peg[1])
+            new_fact = ["top", Term(new_top), txt[1]]
+            self.kb.kb_assert(Fact(new_fact))
+
+
+        # change top and target
+        target = str(txt[2])
+        target_peg = 0
+        if target == "peg1":
+            target_peg = 1
+        elif target == "peg2":
+            target_peg = 2
+        else:
+            target_peg = 3
+
+        pegs = current_state[target_peg - 1]
+
+        if len(pegs) == 0:
+            new_fact = ["empty", txt[2]]
+            self.kb.kb_retract(Fact(new_fact))
+        else:
+            old_top = "disk" + str(pegs[0])
+            new_fact = ["top", Term(old_top), txt[2]]
+            self.kb.kb_retract(Fact(new_fact))
 
 
 
@@ -162,10 +211,12 @@ class Puzzle8Game(GameMaster):
         row3 = []
 
         txt = self.kb.facts
+        empty_index = -1
 
         for f in txt:
             pred = f.statement.predicate
             if pred == "empty":
+                empty_index = int(str(fact[0])[-1])
                 fact = f.statement.terms
                 if str(fact[1]) == "pos1":
                     row1.append(-1)
@@ -254,11 +305,37 @@ class Puzzle8Game(GameMaster):
         ### Student code goes here
 
         txt = movable_statement.terms
-        old_fact = ["position", txt[0], txt[1], txt[2]]
-        fact = ["position", txt[0], txt[3], txt[4]]
-        new_fact = Fact(fact, [])
-        self.kb.kb_add(new_fact)
-        self.kb.kb_remove(Fact(old_fact))
+        tile = txt[0]
+
+        adjacents = []
+
+        for f in self.kb.facts:
+            pred = f.statement.predicate
+            if pred == "adjacent":
+                terms = f.statement.terms
+                if terms[0] == tile:
+                    adjacents.append(terms[1])
+                if terms[1] == tile:
+                    adjacents.append(terms[0])
+
+        for a in adjacents:
+            fact1 = ["adjacent", a, tile]
+            fact2 = ["adjacent", tile, a]
+            self.kb.kb_retract(Fact(fact1))
+            self.kb.kb_retract(Fact(fact2))
+
+        old_fact_1 = ["position", txt[0], txt[1], txt[2]]
+        old_fact_2 = ["empty", txt[3], txt[4]]
+
+        self.kb.kb_retract(Fact(old_fact_1))
+        self.kb.kb_retract(Fact(old_fact_2))
+
+        new_fact_1 = ["position", txt[0], txt[3], txt[4]]
+        new_fact_2 = ["empty", txt[1], txt[2]]
+
+        self.kb.kb_assert(Fact(new_fact_1))
+        self.kb.kb_assert(Fact(new_fact_2))
+
 
     def reverseMove(self, movable_statement):
         """

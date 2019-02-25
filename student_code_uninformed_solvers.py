@@ -4,7 +4,6 @@ from queue import *
 
 class SolverDFS(UninformedSolver):
     def __init__(self, gameMaster, victoryCondition):
-        #self.visits = []
         super().__init__(gameMaster, victoryCondition)
 
 
@@ -33,24 +32,26 @@ class SolverDFS(UninformedSolver):
         if self.victoryCondition == self.currentState.state:
             return True
 
-        while i < len(movables):
-            next_move = movables[i]
+        if movables:
+            while i < len(movables):
+                next_move = movables[i]
 
-            self.gm.makeMove(next_move)
-            new_state = GameState(self.gm.getGameState(), current_depth + 1, next_move)
+                self.gm.makeMove(next_move)
+                new_state = GameState(self.gm.getGameState(), current_depth, next_move)
 
-            new_state.parent = self.currentState
-            self.currentState.children.append(new_state)
+                new_state.parent = self.currentState
+                self.currentState.children.append(new_state)
 
-            self.gm.reverseMove(next_move)
+                self.gm.reverseMove(next_move)
 
-            i += 1
+                i += 1
 
         j = self.currentState.nextChildToVisit
         while j < len(self.currentState.children):
             child = self.currentState.children[self.currentState.nextChildToVisit]
             self.currentState.nextChildToVisit += 1
             if child not in self.visited:
+                child.depth += 1
                 self.visited[child] = True
                 self.gm.makeMove(child.requiredMovable)
                 self.currentState = child
@@ -58,14 +59,18 @@ class SolverDFS(UninformedSolver):
                 break
             j += 1
 
-        if not found:
+        if not found and self.currentState.depth != 0:
+            self.visited[self.currentState] = True
             self.gm.reverseMove(self.currentState.requiredMovable)
             self.currentState = old_state
+            self.currentState.nextChildToVisit += 1
 
         if self.victoryCondition == self.currentState.state:
             return True
-
         return False
+
+
+
 
 
 
@@ -74,6 +79,7 @@ class SolverDFS(UninformedSolver):
 class SolverBFS(UninformedSolver):
     def __init__(self, gameMaster, victoryCondition):
         super().__init__(gameMaster, victoryCondition)
+    Q = Queue()
 
     def solveOneStep(self):
         """
@@ -90,6 +96,51 @@ class SolverBFS(UninformedSolver):
         """
         ### Student code goes here
 
-        return True
+        old_state = self.currentState
+        movables = self.gm.getMovables()
+        current_depth = self.currentState.depth
+        found = False
+        i = 0
+
+        if self.victoryCondition == self.currentState.state:
+            return True
+
+        if movables:
+            while i < len(movables):
+                next_move = movables[i]
+
+                self.gm.makeMove(next_move)
+                new_state = GameState(self.gm.getGameState(), current_depth, next_move)
+
+                new_state.parent = self.currentState
+                self.currentState.children.append(new_state)
+
+                self.gm.reverseMove(next_move)
+
+                i += 1
+
+        for child in self.currentState.children:
+            self.Q.put(child)
+
+        while not self.Q.empty():
+            c = self.Q.get()
+            if c not in self.visited:
+                c.depth += 1
+                self.visited[c] = True
+                self.gm.makeMove(c.requiredMovable)
+                self.currentState = c
+                found = True
+                break
+
+        if not found and self.currentState.depth != 0:
+            self.visited[self.currentState] = True
+            self.gm.reverseMove(self.currentState.requiredMovable)
+            self.currentState = old_state
+            self.currentState.nextChildToVisit += 1
+
+        if self.victoryCondition == self.currentState.state:
+            return True
+        return False
+
 
 
